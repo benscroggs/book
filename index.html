@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Book a call with Ben</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<script>
+/* ============ EDIT THESE SETTINGS ============ */
+const CONFIG = {
+  name: "Ben Scroggs",
+  title: "Global Account Manager, OVHcloud",
+  phone: "+12146058278",          // your cell, with +1
+  email: "ben.scroggs@us.ovhcloud.com",
+  timezone: "America/Chicago",    // your time zone
+  lengths: [15, 30, 45],          // meeting lengths offered (minutes)
+  slotStep: 30,                   // start times every N minutes
+  minNoticeHours: 3,             // no bookings sooner than this
+  daysAhead: 30,                  // how far out people can book
+  // Weekly hours, 24h clock. 0 = Sunday ... 6 = Saturday. Leave [] for off.
+  hours: {
+    0: [],
+    1: [["08:30","11:00"],["12:00","17:30"]],
+    2: [["08:30","11:00"],["12:00","17:30"]],
+    3: [["08:30","11:00"],["12:00","17:30"]],
+    4: [["08:30","11:00"],["12:00","17:30"]],
+    5: [["08:30","11:00"],["12:00","17:30"]],
+    6: []
+  },
+  // Busy times you add by hand. Full day: {date}. Part of a day: {date, from, to}.
+  blocked: [
+    // { date: "2026-10-12" },
+    // { date: "2026-10-06", from: "13:00", to: "15:00" },
+  ],
+  meetingLink: "https://ovhcloud.webex.com/meet/ben.scroggs"                 // optional: your Teams/Zoom/Meet link for the invite
+};
+/* ============================================= */
+</script>
+<style>
+:root{
+  --ink:#16243a; --paper:#f7f8fa; --panel:#ffffff; --line:#d9dee6;
+  --muted:#5a6679; --accent:#0f5fa8; --accent-ink:#ffffff; --soft:#e7f0f9;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#e6ebf2; --paper:#101722; --panel:#172131; --line:#2a3647;
+    --muted:#98a4b6; --accent:#5aa2e6; --accent-ink:#0b1320; --soft:#1d3048;
+  }
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font:400 16px/1.5 "Public Sans",system-ui,-apple-system,sans-serif}
+main{max-width:920px;margin:0 auto;padding:40px 20px 60px;display:grid;grid-template-columns:260px 1fr;gap:40px}
+@media (max-width:760px){main{grid-template-columns:1fr;gap:24px;padding-top:24px}}
+.who h1{font:600 2rem/1.15 "Source Serif 4",Georgia,serif;margin:0 0 4px}
+.who p{margin:0;color:var(--muted)}
+.lengths{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.who .note{margin-top:24px;font-size:.9rem}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 14px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.board{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px}
+.steps{display:grid;grid-template-columns:1fr 200px;gap:24px}
+@media (max-width:560px){.steps{grid-template-columns:1fr}}
+h2{font:600 1.1rem/1.3 "Public Sans",sans-serif;margin:0 0 12px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.dow{font-size:.8rem;color:var(--muted);padding-bottom:4px}
+.day{aspect-ratio:1;border:0;border-radius:8px;background:transparent;font-weight:500}
+.day.open{background:var(--soft);color:var(--accent);font-weight:700}
+.day.open:hover{outline:1px solid var(--accent)}
+.day[disabled]{color:var(--muted);opacity:.45;cursor:default}
+.day[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.slots{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto}
+.slot{border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:6px;padding:9px;font-weight:600}
+.slot:hover{background:var(--soft)}
+.empty{color:var(--muted);font-size:.95rem}
+.tz{color:var(--muted);font-size:.85rem;margin-top:14px}
+form{display:grid;gap:14px;max-width:440px}
+label{display:grid;gap:4px;font-weight:500;font-size:.95rem}
+input,textarea{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px}
+.picked{font:600 1.35rem/1.3 "Source Serif 4",Georgia,serif;margin:0 0 4px}
+.actions{display:grid;gap:10px;max-width:440px;margin-top:18px}
+.primary{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:13px;font-weight:700;text-align:center;text-decoration:none;display:block}
+.secondary{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:11px;text-align:center;text-decoration:none;color:var(--ink);display:block}
+.link{border:0;background:none;color:var(--accent);padding:0;text-decoration:underline}
+.hidden{display:none}
+.err{color:#c0392b;font-size:.9rem;margin:0}
+</style>
+</head>
+<body>
+<main>
+  <section class="who">
+    <h1 id="hname"></h1>
+    <p id="htitle"></p>
+    <div class="lengths" id="lengths" role="group" aria-label="Meeting length"></div>
+    <p class="note empty">Pick a time, then send it to me by text or email. I'll confirm the same day.</p>
+  </section>
+
+  <section class="board">
+    <div id="pick">
+      <div class="steps">
+        <div>
+          <h2 id="monthLabel">Choose a day</h2>
+          <div class="days" id="days"></div>
+        </div>
+        <div>
+          <h2 id="slotLabel">Times</h2>
+          <div class="slots" id="slots"><p class="empty">Choose a day to see open times.</p></div>
+        </div>
+      </div>
+      <p class="tz" id="tzNote"></p>
+    </div>
+
+    <div id="details" class="hidden">
+      <button class="link" id="back1">Change time</button>
+      <p class="picked" id="pickedLabel"></p>
+      <p class="empty" id="pickedSub" style="margin-top:0"></p>
+      <form id="form" novalidate>
+        <label>Your name<input id="fName" autocomplete="name" required></label>
+        <label>Company<input id="fCo" autocomplete="organization"></label>
+        <label>Email<input id="fEmail" type="email" autocomplete="email" required></label>
+        <label>What would you like to cover?<textarea id="fTopic" rows="3"></textarea></label>
+        <p class="err hidden" id="formErr">Add your name and a valid email.</p>
+        <button class="primary" type="submit">Continue</button>
+      </form>
+    </div>
+
+    <div id="send" class="hidden">
+      <button class="link" id="back2">Edit details</button>
+      <p class="picked" id="sendLabel"></p>
+      <p class="empty">Your time isn't held until I confirm. Send the request below.</p>
+      <div class="actions">
+        <a class="primary" id="smsBtn">Text Ben to book</a>
+        <a class="secondary" id="mailBtn">Email Ben instead</a>
+        <button class="secondary" id="icsBtn">Save to my calendar</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const C = CONFIG, TZ = C.timezone;
+const viewerTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+let len = C.lengths[0], selDay = null, selSlot = null;
+
+/* --- time zone helpers (no libraries) --- */
+function parts(date, tz){
+  const o = {};
+  new Intl.DateTimeFormat("en-US",{timeZone:tz,hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"})
+    .formatToParts(date).forEach(p => o[p.type] = p.value);
+  return o;
+}
+function offset(date, tz){
+  const p = parts(date, tz);
+  return Date.UTC(+p.year, p.month-1, +p.day, +p.hour, +p.minute, +p.second) - Math.floor(date.getTime()/1000)*1000;
+}
+function hostInstant(y, m, d, hhmm){
+  const [h, mi] = hhmm.split(":").map(Number);
+  const guess = Date.UTC(y, m, d, h, mi);
+  let t = guess - offset(new Date(guess), TZ);
+  const o2 = offset(new Date(t), TZ);
+  t = guess - o2;
+  return new Date(t);
+}
+const key = (y,m,d) => `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+const fmtTime = (dt, tz) => dt.toLocaleTimeString([], {hour:"numeric", minute:"2-digit", timeZone:tz});
+const fmtDate = (dt, tz) => dt.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric", timeZone:tz});
+
+/* --- availability --- */
+function slotsFor(y, m, d){
+  const dow = new Date(Date.UTC(y, m, d)).getUTCDay();
+  const k = key(y, m, d);
+  const blocks = C.blocked.filter(b => b.date === k);
+  if (blocks.some(b => !b.from)) return [];
+  const earliest = Date.now() + C.minNoticeHours * 3600e3;
+  const out = [];
+  for (const [from, to] of (C.hours[dow] || [])){
+    const end = hostInstant(y, m, d, to).getTime();
+    for (let s = hostInstant(y, m, d, from).getTime(); s + len*60e3 <= end; s += C.slotStep*60e3){
+      const e = s + len*60e3;
+      if (s < earliest) continue;
+      const clash = blocks.some(b => s < hostInstant(y,m,d,b.to).getTime() && e > hostInstant(y,m,d,b.from).getTime());
+      if (!clash) out.push(new Date(s));
+    }
+  }
+  return out;
+}
+
+/* --- render --- */
+document.getElementById("hname").textContent = `Book a call with ${C.name}`;
+document.getElementById("htitle").textContent = C.title;
+document.getElementById("tzNote").textContent =
+  `Times shown in your time zone (${viewerTZ.replace(/_/g," ")}).`;
+
+const lengthsEl = document.getElementById("lengths");
+C.lengths.forEach(n => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = `${n} min`;
+  b.setAttribute("aria-pressed", n === len);
+  b.onclick = () => { len = n; [...lengthsEl.children].forEach(c => c.setAttribute("aria-pressed", c === b)); renderDays(); renderSlots(); };
+  lengthsEl.appendChild(b);
+});
+
+function hostToday(){
+  const p = parts(new Date(), TZ);
+  return [+p.year, p.month-1, +p.day];
+}
+function renderDays(){
+  const el = document.getElementById("days");
+  el.innerHTML = "";
+  ["S","M","T","W","T","F","S"].forEach(x => { const s = document.createElement("div"); s.className="dow"; s.textContent=x; el.appendChild(s); });
+  const [ty, tm, td] = hostToday();
+  const start = new Date(Date.UTC(ty, tm, td));
+  for (let i = 0; i < start.getUTCDay(); i++) el.appendChild(document.createElement("div"));
+  for (let i = 0; i < C.daysAhead; i++){
+    const dt = new Date(start.getTime() + i*86400e3);
+    const y = dt.getUTCFullYear(), m = dt.getUTCMonth(), d = dt.getUTCDate();
+    const b = document.createElement("button");
+    b.className = "day"; b.textContent = d;
+    b.setAttribute("aria-label", dt.toLocaleDateString([], {weekday:"long",month:"long",day:"numeric",timeZone:"UTC"}));
+    const open = slotsFor(y, m, d).length > 0;
+    if (open){ b.classList.add("open"); b.onclick = () => { selDay = [y,m,d]; renderDays(); renderSlots(); }; }
+    else b.disabled = true;
+    if (selDay && selDay.join() === [y,m,d].join()) b.setAttribute("aria-pressed","true");
+    el.appendChild(b);
+  }
+  const lbl = start.toLocaleDateString([], {month:"long", year:"numeric", timeZone:"UTC"});
+  document.getElementById("monthLabel").textContent = lbl;
+}
+function renderSlots(){
+  const el = document.getElementById("slots");
+  el.innerHTML = "";
+  if (!selDay){ el.innerHTML = '<p class="empty">Choose a day to see open times.</p>'; return; }
+  const list = slotsFor(...selDay);
+  document.getElementById("slotLabel").textContent =
+    new Date(Date.UTC(...selDay)).toLocaleDateString([], {weekday:"short", month:"short", day:"numeric", timeZone:"UTC"});
+  if (!list.length){ el.innerHTML = '<p class="empty">No open times left this day. Try another.</p>'; return; }
+  list.forEach(dt => {
+    const b = document.createElement("button");
+    b.className = "slot"; b.textContent = fmtTime(dt, viewerTZ);
+    b.onclick = () => { selSlot = dt; show("details"); };
+    el.appendChild(b);
+  });
+}
+function show(id){
+  ["pick","details","send"].forEach(x => document.getElementById(x).classList.toggle("hidden", x !== id));
+  if (selSlot){
+    const label = `${fmtDate(selSlot, viewerTZ)}, ${fmtTime(selSlot, viewerTZ)}`;
+    document.getElementById("pickedLabel").textContent = label;
+    document.getElementById("sendLabel").textContent = label;
+    document.getElementById("pickedSub").textContent =
+      `${len} minutes. That's ${fmtTime(selSlot, TZ)} for ${C.name} (${TZ.replace(/_/g," ")}).`;
+  }
+}
+document.getElementById("back1").onclick = () => show("pick");
+document.getElementById("back2").onclick = () => show("details");
+
+/* --- request + calendar file --- */
+function requestText(){
+  const n = fName.value.trim(), co = fCo.value.trim(), t = fTopic.value.trim();
+  return `Hi ${C.name}, I'd like to book a ${len}-min call on ${fmtDate(selSlot, TZ)} at ${fmtTime(selSlot, TZ)} your time.\n` +
+         `Name: ${n}${co ? " (" + co + ")" : ""}\nEmail: ${fEmail.value.trim()}` + (t ? `\nTopic: ${t}` : "");
+}
+document.getElementById("form").onsubmit = e => {
+  e.preventDefault();
+  const ok = fName.value.trim() && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(fEmail.value.trim());
+  document.getElementById("formErr").classList.toggle("hidden", !!ok);
+  if (!ok) return;
+  const body = encodeURIComponent(requestText());
+  const ios = /iPhone|iPad|Macintosh/.test(navigator.userAgent);
+  smsBtn.href = `sms:${C.phone}${ios ? "&" : "?"}body=${body}`;
+  mailBtn.href = `mailto:${C.email}?subject=${encodeURIComponent("Call request: " + fName.value.trim())}&body=${body}`;
+  show("send");
+};
+document.getElementById("icsBtn").onclick = () => {
+  const z = d => d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  const end = new Date(selSlot.getTime() + len*60e3);
+  const esc = s => s.replace(/[\\,;]/g, m => "\\" + m).replace(/\n/g, "\\n");
+  const desc = `Pending confirmation from ${C.name}.` + (C.meetingLink ? `\nJoin: ${C.meetingLink}` : "") + `\n${C.email} / ${C.phone}`;
+  const ics = [
+    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//BookBen//EN","BEGIN:VEVENT",
+    `UID:${Date.now()}@bookben`, `DTSTAMP:${z(new Date())}`,
+    `DTSTART:${z(selSlot)}`, `DTEND:${z(end)}`,
+    `SUMMARY:${esc("Call with " + C.name + " (" + C.title + ")")}`,
+    `DESCRIPTION:${esc(desc)}`, C.meetingLink ? `LOCATION:${esc(C.meetingLink)}` : "",
+    "END:VEVENT","END:VCALENDAR"
+  ].filter(Boolean).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([ics], {type:"text/calendar"}));
+  a.download = "call-with-" + C.name.toLowerCase() + ".ics";
+  a.click();
+};
+
+renderDays();
+</script>
+</body>
+</html>
