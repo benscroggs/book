@@ -132,11 +132,10 @@ input,textarea{font:inherit;color:var(--ink);background:var(--paper);border:1px 
     <div id="send" class="hidden">
       <button class="link" id="back2">Edit details</button>
       <p class="picked" id="sendLabel"></p>
-      <p class="empty">Your time isn't held until I confirm. Send the request below.</p>
+     <p class="empty">Your time isn't held until I confirm. Send the request below.</p>
       <div class="actions">
         <a class="primary" id="smsBtn">Text Ben to book</a>
         <a class="secondary" id="mailBtn">Email Ben instead</a>
-        <button class="secondary" id="icsBtn">Save to my calendar</button>
       </div>
     </div>
   </section>
@@ -276,25 +275,6 @@ document.getElementById("form").onsubmit = e => {
   mailBtn.href = `mailto:${C.email}?subject=${encodeURIComponent("Call request: " + fName.value.trim())}&body=${body}`;
   show("send");
 };
-document.getElementById("icsBtn").onclick = () => {
-  const z = d => d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
-  const end = new Date(selSlot.getTime() + len*60e3);
-  const esc = s => s.replace(/[\\,;]/g, m => "\\" + m).replace(/\n/g, "\\n");
-  const desc = `Pending confirmation from ${C.name}.` + (C.meetingLink ? `\nJoin: ${C.meetingLink}` : "") + `\n${C.email} / ${C.phone}`;
-  const ics = [
-    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//BookBen//EN","BEGIN:VEVENT",
-    `UID:${Date.now()}@bookben`, `DTSTAMP:${z(new Date())}`,
-    `DTSTART:${z(selSlot)}`, `DTEND:${z(end)}`,
-    `SUMMARY:${esc("Call with " + C.name + " (" + C.title + ")")}`,
-    `DESCRIPTION:${esc(desc)}`, C.meetingLink ? `LOCATION:${esc(C.meetingLink)}` : "",
-    "END:VEVENT","END:VCALENDAR"
-  ].filter(Boolean).join("\r\n");
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([ics], {type:"text/calendar"}));
-  a.download = "call-with-" + C.name.toLowerCase() + ".ics";
-  a.click();
-};
-
 renderDays();
 </script>
 </body>
