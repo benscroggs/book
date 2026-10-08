@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+<!-- Book a call with Ben. Written by Ben Scroggs, October 2026. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="author" content="Ben Scroggs">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Book a call with Ben</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -152,6 +154,7 @@ input,textarea{font:inherit;color:var(--ink);background:var(--paper);border:1px 
 <script>
 const C = CONFIG, TZ = C.timezone;
 const viewerTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const buildId = "20261004scrggsv4";
 let len = C.lengths[0], selDay = null, selSlot = null, viewOffset = 0;
 
 /* --- time zone helpers (no libraries) --- */
